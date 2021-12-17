@@ -242,13 +242,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void autoInventoryDelivery(List<OrderItem> orderItemList) {
-
+        Integer il_id = null;
         for (OrderItem oi : orderItemList) {
             List<Inventory> inventories = inventoryMapper.selectInventoryByName(oi.getName());
             for (Inventory inventory : inventories) {
                 inventory.setInventory_prior(inventoryMapper.queryWarehouseByIlID(inventory.getIl_id()).getInventory_prior());
             }
             inventories.sort(new inventoryComparator());
+            il_id = inventories.get(0).getIl_id();
             for (Inventory inventory : inventories) {
                 if (oi.getQuantity() > inventory.getQuantity()) {
                     oi.setQuantity(oi.getQuantity() - inventory.getQuantity());
@@ -259,6 +260,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
+        ordersMapper.updateOrderIlid( orderItemList.get(0).getO_id(), il_id);
     }
 
     @Override

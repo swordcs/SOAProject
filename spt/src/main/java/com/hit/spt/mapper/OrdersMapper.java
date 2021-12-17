@@ -28,4 +28,6 @@ public interface OrdersMapper {
 
     List<Orders> queryAllOrdersWithCname();
 
+    int updateOrderIlid(Integer o_id,Integer il_id);
+
 }

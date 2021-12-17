@@ -1,5 +1,7 @@
 package com.hit.spt.controller;
 
+import com.hit.spt.mapper.CustomerMapper;
+import com.hit.spt.mapper.InventoryMapper;
 import com.hit.spt.mapper.OrdersMapper;
 import com.hit.spt.pojo.OrderItem;
 import com.hit.spt.pojo.Orders;
@@ -22,9 +24,14 @@ public class OrdersViewController {
     @Autowired
     OrdersMapper ordersMapper;
 
+    @Autowired
+    InventoryMapper inventoryMapper;
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    CustomerMapper customerMapper;
 
     @Autowired
     OrdersViewService ordersViewService;
@@ -66,7 +73,11 @@ public class OrdersViewController {
     public String orderReview(Integer o_id, Model model) {
         Orders orders = ordersMapper.queryOrdersByOid(o_id);
         orderService.getGoodsCustomerInfo(model, o_id, orders.getType());
+        String inventoryLocation = inventoryMapper.queryInventoryLocationWithIlid(orders.getIl_id());
+        String customerLocation = customerMapper.queryCustomerById(orders.getC_id()).getAddress();
         model.addAttribute("theOrder", orders);
+        model.addAttribute("inventoryLocation",inventoryLocation);
+        model.addAttribute("customerLocation",customerLocation);
         return "orderReview";
     }
 

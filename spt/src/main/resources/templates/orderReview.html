@@ -278,35 +278,81 @@
                                                             <div class="sl-content">
                                                                 <div class="sl-date text-muted">流程终止</div>
                                                                 <p>销售单完成</p>
+                                                                <input type="hidden" id="inventoryLocation"
+                                                                       th:value="${inventoryLocation}">
+                                                                <input type="hidden" id="customerLocation"
+                                                                       th:value="${customerLocation}">
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-										<!--API:路径规划-->
+                                        <!--API:路径规划-->
                                         <style type="text/css">
-                                            #container{
+                                            #container {
                                                 /*margin*/
                                                 /*margin: auto 5% 5% auto;*/
-                                                width:100%;
-                                                height:40%;
+                                                width: 100%;
+                                                height: 40%;
                                             }
                                         </style>
-                                        <script type="text/javascript" src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=VFFw8h1rN0GbaGcw7dBCkwLS48vRdv46"></script>
+                                        <a onclick="centerMap()">查看地图</a>>
+                                        <script type="text/javascript"
+                                                src=" http://api.map.baidu.com/getscript?type=webgl&v=1.0&ak=VFFw8h1rN0GbaGcw7dBCkwLS48vRdv46&services=&t=20211122154601"></script>
                                         <div id="container">
-                                            <form th:action="@{/getAddress(i_id=1,o_id=${theOrder.o_id})}" th:method="get">
+                                            <form th:action="@{/getAddress(i_id=1,o_id=${theOrder.o_id})}"
+                                                  th:method="get">
                                             </form>
                                         </div>
                                         <script>
-                                            var map = new BMapGL.Map("container");
-                                            map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 11);
 
-                                            var p1 = new BMapGL.Point(116.301934,39.977552);
-                                            var p2 = new BMapGL.Point(116.508328,39.919141);
+                                            var arr1;
+                                            var arr2;
 
-                                            var driving = new BMapGL.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
-                                            driving.search(p1, p2);
+                                            function getPoint1(locat) {
+                                                var myGeo = new BMapGL.Geocoder();
+                                                myGeo.getPoint(locat, function (point) {
+                                                    if (point) {
+                                                        arr1 = point;
+                                                    } else {
+                                                        alert('您选择的地址没有解析到结果！');
+                                                    }
+                                                }, locat.substring(0, 3));
+                                                return arr1;
+                                            }
+
+                                            function getPoint2(locat) {
+                                                var myGeo = new BMapGL.Geocoder();
+                                                myGeo.getPoint(locat, function (point) {
+                                                    if (point) {
+                                                        arr2 = point;
+                                                    } else {
+                                                        alert('您选择的地址没有解析到结果！');
+                                                    }
+                                                }, locat.substring(0, 3));
+                                                return arr2;
+                                            }
+
+                                            var loc1 = document.getElementById("inventoryLocation").value;
+                                            var loc2 = document.getElementById("customerLocation").value;
+                                            var p1 = getPoint1(loc1);
+                                            var p2 = getPoint2(loc2);
+                                            var map;
+                                            var driving;
+
+                                            function centerMap(){
+                                                map = new BMapGL.Map("container");
+                                                var loc1 = document.getElementById("inventoryLocation").value;
+                                                map.centerAndZoom(getPoint1(loc1), 11);
+                                                 driving = new BMapGL.DrivingRoute(map, {
+                                                    renderOptions: {
+                                                        map: map,
+                                                        autoViewport: true
+                                                    }
+                                                });
+                                                driving.search(getPoint1(loc1),getPoint2(loc2));
+                                            }
 
                                         </script>
                                         <!--API:路径规划-->
@@ -423,34 +469,38 @@
                                                        th:if="${theOrder.status}=='paid'
                                                        and ${#strings.substring(session.permissions, 7, 8)}=='1'">关闭订单</a>
 
-<!--                                                    <a class="btn warning m-b"-->
-<!--                                                       th:href="@{/deleteOrder(o_id=${theOrder.o_id})}" th:if="${theOrder.status}=='closed' or ${theOrder.status}=='unchecked'">删除订单</a>-->
+                                                    <!--                                                    <a class="btn warning m-b"-->
+                                                    <!--                                                       th:href="@{/deleteOrder(o_id=${theOrder.o_id})}" th:if="${theOrder.status}=='closed' or ${theOrder.status}=='unchecked'">删除订单</a>-->
                                                     <a class="btn warning m-b" data-toggle="modal" data-target="#m-sm"
-                                                        th:if="(${theOrder.status}=='closed' or ${theOrder.status}=='unchecked')
+                                                       th:if="(${theOrder.status}=='closed' or ${theOrder.status}=='unchecked')
                                                         and ${#strings.substring(session.permissions, 7, 8)}=='1'">删除</a>
                                                 </span>
-                                                    <!-- small modal -->
-                                                    <div id="m-sm" class="modal" data-backdrop="true">
-                                                        <div class="row-col h-v">
-                                                            <div class="row-cell v-m">
-                                                                <div class="modal-dialog modal-sm">
-                                                                    <div class="modal-content">
-                                                                        <div class="modal-header">
-                                                                            <h5 class="modal-title">删除订单</h5>
-                                                                        </div>
-                                                                        <div class="modal-body text-center p-lg">
-                                                                            <p>您确定要删除该订单吗? 删除之后将无法恢复！！！</p>
-                                                                        </div>
-                                                                        <div class="modal-footer">
-                                                                            <button type="button" class="btn dark-white p-x-md" data-dismiss="modal">取消</button>
-                                                                            <a class="btn danger p-x-md" th:href="@{/deleteOrder(o_id=${theOrder.o_id})}">确定</a>
-                                                                        </div>
+                                                <!-- small modal -->
+                                                <div id="m-sm" class="modal" data-backdrop="true">
+                                                    <div class="row-col h-v">
+                                                        <div class="row-cell v-m">
+                                                            <div class="modal-dialog modal-sm">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">删除订单</h5>
+                                                                    </div>
+                                                                    <div class="modal-body text-center p-lg">
+                                                                        <p>您确定要删除该订单吗? 删除之后将无法恢复！！！</p>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button"
+                                                                                class="btn dark-white p-x-md"
+                                                                                data-dismiss="modal">取消
+                                                                        </button>
+                                                                        <a class="btn danger p-x-md"
+                                                                           th:href="@{/deleteOrder(o_id=${theOrder.o_id})}">确定</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <!-- small modal -->
+                                                </div>
+                                                <!-- small modal -->
                                             </form>
                                             <!-- fields -->
                                             <!-- / fields -->

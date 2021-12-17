@@ -48,4 +48,5 @@ public interface InventoryMapper {
     Inventory queryWarehouseByIlID(Integer il_id);
 
     Integer updateWarehouse(Inventory inventory);
+    String queryInventoryLocationWithIlid(Integer il_id);
 }

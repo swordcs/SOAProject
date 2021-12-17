@@ -17,4 +17,5 @@ public class Orders {
     private Double total_profit;
     private String time_stamp;
     private String name; // 客户名
+    private  Integer il_id;
 }

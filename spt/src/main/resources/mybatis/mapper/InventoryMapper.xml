@@ -88,4 +88,7 @@
             inventory_prior = #{inventory_prior}
         where il_id = #{il_id}
     </update>
+    <select id="queryInventoryLocationWithIlid" resultType="java.lang.String">
+        select inventory_location from inventory_list where il_id = #{il_id}
+    </select>
 </mapper>

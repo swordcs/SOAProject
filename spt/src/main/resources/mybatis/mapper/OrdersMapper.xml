@@ -49,6 +49,7 @@
                orders.total_cost,
                orders.total_profit,
                orders.time_stamp,
+               orders.il_id,
                customer_info.name
         from orders,
              customer_info
@@ -92,6 +93,11 @@
     <update id="updateOrderStatus">
         update orders
         set status = #{status}
+        where o_id = #{o_id}
+    </update>
+    <update id="updateOrderIlid">
+        update orders
+        set il_id = #{il_id}
         where o_id = #{o_id}
     </update>
 </mapper>
