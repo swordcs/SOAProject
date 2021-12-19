@@ -30,7 +30,7 @@
     <link rel="stylesheet" th:href="@{/assets/styles/font.css}" type="text/css" />
 </head>
 
-<body>
+<body onload="initialize()">
     <div class="app" id="app">
 
         <!-- ############ LAYOUT START-->
@@ -254,10 +254,11 @@
                                     <p style="color:red" th:text="${msg}" th:if="${msg} != null"></p>
                                 </div>
                                 <div class="form-group">
-                                    <label for="customer_addr">用户地址</label>
-                                    <input type="text" class="form-control" name="addr" id="customer_addr"
-                                        placeholder="地址" required>
+                                    <label id="r-result">用户地址</label>
+                                    <input  class="form-control" name="addr" placeholder="智能填写地址"  type="text" id="suggestId" /></div>
+                                    <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;">
                                 </div>
+                                <div id="l-map"></div>
                                 <div class="form-group">
                                     客户性别：
                                     <label for="male">男</label>
@@ -265,6 +266,72 @@
                                     <label for="female">女</label>
                                     <input type="radio" name="sex" id="female" value="false" />
                                 </div>
+                                <script type="text/javascript"
+                                        src="http://api.map.baidu.com/api?v=2.0&ak=VFFw8h1rN0GbaGcw7dBCkwLS48vRdv46&services=&t=20211122154601"></script>
+
+                                <script type="text/javascript">
+                                    // 百度地图API功能
+                                    var map = new BMap.Map("l-map");
+                                    var myValue;
+                                    var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+                                        {
+                                            "input": "suggestId"
+                                            , "location": map
+                                        });
+
+                                    function initialize() {
+                                        function G(id) {
+                                            return document.getElementById(id);
+                                        }
+
+                                        map.centerAndZoom("北京", 12);                   // 初始化地图,设置城市和地图级别。
+
+
+                                        ac.addEventListener("onhighlight", function (e) {  //鼠标放在下拉列表上的事件
+                                            var str = "";
+                                            var _value = e.fromitem.value;
+                                            var value = "";
+                                            if (e.fromitem.index > -1) {
+                                                value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                                            }
+                                            str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+
+                                            value = "";
+                                            if (e.toitem.index > -1) {
+                                                _value = e.toitem.value;
+                                                value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                                            }
+                                            str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+                                            G("searchResultPanel").innerHTML = str;
+                                        });
+
+                                        ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
+                                            var _value = e.item.value;
+                                            myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
+                                            G("searchResultPanel").innerHTML = "onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+
+                                            setPlace();
+                                        });
+                                    }
+
+                                    function setPlace(){
+                                        map.clearOverlays();    //清除地图上所有覆盖物
+                                        function myFun(){
+                                            var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+                                            map.centerAndZoom(pp, 18);
+                                            map.addOverlay(new BMap.Marker(pp));    //添加标注
+                                        }
+                                        var local = new BMap.LocalSearch(map, { //智能搜索
+                                            onSearchComplete: myFun
+                                        });
+                                        local.search(myValue);
+                                    }
+                                    var $x=$.noConflict();
+
+                                    initialize()
+                                    $x(initialize)
+                                </script>
+
                                 <div class="form-group">
                                     客户类型：
                                     <label for="retail">零售</label>
@@ -335,6 +402,7 @@
     <!-- ajax -->
     <script th:src="@{/libs/jquery/jquery-pjax/jquery.pjax.js}"></script>
     <script th:src="@{/scripts/ajax.js}"></script>
+
     <!-- endbuild -->
 </body>
 

@@ -79,8 +79,8 @@
         where inventory_list.il_id = #{il_id}
     </select>
     <insert id="insertWarehouse" parameterType="Inventory">
-        insert into inventory_list(inventory_name, inventory_info, inventory_prior)
-        value (#{inventory_name}, #{inventory_info}, #{inventory_prior})
+        insert into inventory_list(inventory_name, inventory_info, inventory_prior, inventory_location)
+        value (#{inventory_name}, #{inventory_info}, #{inventory_prior}, #{inventory_location})
     </insert>
     <update id="updateWarehouse" parameterType="Inventory">
         update inventory_list

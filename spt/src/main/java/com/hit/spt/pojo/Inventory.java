@@ -19,4 +19,5 @@ public class Inventory {
     private String inventory_info;
     private Integer il_id;
     private Integer inventory_prior;
+    private String inventory_location;
 }
