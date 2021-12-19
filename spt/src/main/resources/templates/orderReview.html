@@ -27,7 +27,7 @@
     <!-- endbuild -->
     <link rel="stylesheet" th:href="@{/assets/styles/font.css}" type="text/css"/>
 </head>
-<body>
+<body onload="centerMap()">
 <div class="app" id="app">
 
     <!-- ############ LAYOUT START-->
@@ -298,7 +298,7 @@
                                                 height: 40%;
                                             }
                                         </style>
-
+                                        <a onclick="centerMap()">刷新地图</a>>
                                         <script type="text/javascript"
                                                 src=" http://api.map.baidu.com/getscript?type=webgl&v=1.0&ak=VFFw8h1rN0GbaGcw7dBCkwLS48vRdv46&services=&t=20211122154601"></script>
                                         <div id="container">
@@ -354,6 +354,9 @@
                                                 });
                                                 driving.search(getPoint1(loc1),getPoint2(loc2));
                                             }
+
+                                            var $x = $.noConflict();
+                                            $x(centerMap)
 
                                         </script>
                                         <!--API:路径规划-->
